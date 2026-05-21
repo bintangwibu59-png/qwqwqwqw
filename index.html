@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farewell Party — Bintang</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C870;
+    --gold-pale: #F5E6B8;
+    --gold-dark: #8B6914;
+    --black: #0A0A0A;
+    --black-soft: #111111;
+    --black-mid: #1A1A1A;
+    --white: #FAF6EE;
+    --text-dim: #8A7A5A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ─── PARTICLE CANVAS ─── */
+  #particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+    z-index: 10;
+  }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ─── ORNAMENT LINE ─── */
+  .ornament {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+  }
+  .ornament::before, .ornament::after {
+    content: '';
+    height: 1px;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .ornament::after {
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .ornament span {
+    color: var(--gold);
+    font-size: 18px;
+  }
+
+  /* ══════════════════════════════
+     SCREEN 1 — MAIN MENU
+  ══════════════════════════════ */
+  #screen-menu {
+    background: radial-gradient(ellipse at 50% 30%, #1a1200 0%, var(--black) 70%);
+  }
+
+  .menu-frame {
+    border: 1px solid rgba(201,168,76,0.25);
+    padding: 60px 80px;
+    text-align: center;
+    position: relative;
+    max-width: 560px;
+    width: 90%;
+    background: rgba(10,8,0,0.6);
+    backdrop-filter: blur(8px);
+  }
+
+  /* corner decorations */
+  .menu-frame::before, .menu-frame::after,
+  .corner-br, .corner-tl-inner {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-color: var(--gold);
+    border-style: solid;
+  }
+  .menu-frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .menu-frame::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  .corner-br { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+  .corner-tl-inner { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+
+  .menu-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .menu-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(36px, 7vw, 58px);
+    font-weight: 700;
+    letter-spacing: 8px;
+    color: var(--gold-light);
+    text-shadow: 0 0 40px rgba(201,168,76,0.4), 0 0 80px rgba(201,168,76,0.15);
+    line-height: 1.1;
+    margin: 4px 0;
+  }
+
+  .menu-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin: 14px 0 32px;
+    line-height: 1.7;
+  }
+
+  .btn-start {
+    display: inline-block;
+    padding: 14px 52px;
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s, box-shadow 0.4s;
+  }
+  .btn-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    z-index: -1;
+  }
+  .btn-start:hover { color: var(--black); box-shadow: 0 0 30px rgba(201,168,76,0.4); }
+  .btn-start:hover::before { transform: scaleX(1); }
+
+  /* ══════════════════════════════
+     SCREEN 2 — CHOOSE
+  ══════════════════════════════ */
+  #screen-choose {
+    background: radial-gradient(ellipse at 50% 50%, #120e00 0%, var(--black) 70%);
+  }
+
+  .choose-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(11px, 2vw, 14px);
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .choose-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 300;
+    color: var(--white);
+    letter-spacing: 3px;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .cards-row {
+    display: flex;
+    gap: 40px;
+    align-items: stretch;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .card-choice {
+    width: 220px;
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 40px 28px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    background: rgba(12,10,0,0.7);
+    backdrop-filter: blur(6px);
+    transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
+    overflow: hidden;
+  }
+  .card-choice::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.1), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .card-choice:hover {
+    border-color: var(--gold);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(201,168,76,0.2);
+  }
+  .card-choice:hover::before { opacity: 1; }
+
+  .card-icon {
+    font-size: 52px;
+    margin-bottom: 18px;
+    display: block;
+    filter: sepia(1) saturate(2) brightness(1.1);
+  }
+
+  .card-label {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    letter-spacing: 5px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* corner on cards */
+  .card-choice .c1,.card-choice .c2,.card-choice .c3,.card-choice .c4 {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-color: var(--gold);
+    border-style: solid;
+    opacity: 0.6;
+  }
+  .card-choice .c1 { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+  .card-choice .c2 { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
+  .card-choice .c3 { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
+  .card-choice .c4 { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+
+  /* ══════════════════════════════
+     SCREEN 3 — INFO (Dress/Suits)
+  ══════════════════════════════ */
+  #screen-info {
+    background: radial-gradient(ellipse at 40% 40%, #130a00 0%, var(--black) 65%);
+    padding: 40px;
+    justify-content: center;
+  }
+
+  .info-box {
+    max-width: 600px;
+    width: 100%;
+    border: 1px solid rgba(201,168,76,0.25);
+    padding: 48px 52px;
+    background: rgba(10,8,0,0.65);
+    backdrop-filter: blur(10px);
+    position: relative;
+    text-align: center;
+  }
+  .info-box::before { content: ''; position: absolute; top: -1px; left: -1px; width: 20px; height: 20px; border: 2px solid var(--gold); border-right: none; border-bottom: none; }
+  .info-box::after  { content: ''; position: absolute; bottom: -1px; right: -1px; width: 20px; height: 20px; border: 2px solid var(--gold); border-left: none; border-top: none; }
+
+  .info-tag {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--black);
+    background: var(--gold);
+    padding: 4px 16px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .info-heading {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 4vw, 32px);
+    letter-spacing: 6px;
+    color: var(--gold-light);
+    text-shadow: 0 0 30px rgba(201,168,76,0.3);
+    margin-bottom: 6px;
+  }
+
+  .info-body {
+    margin: 22px 0 28px;
+    text-align: left;
+  }
+
+  .info-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .info-row:last-child { border-bottom: none; }
+
+  .info-row-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .info-row-content {}
+  .info-row-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .info-row-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--white);
+    line-height: 1.5;
+  }
+  .info-row-value em {
+    font-style: italic;
+    color: var(--gold-pale);
+  }
+
+  /* ══════════════════════════════
+     SCREEN 4 — POSTER
+  ══════════════════════════════ */
+  #screen-poster {
+    background: var(--black);
+    padding: 20px;
+  }
+
+  .poster-wrap {
+    max-width: 420px;
+    width: 90%;
+    border: 1px solid rgba(201,168,76,0.35);
+    padding: 12px;
+    background: rgba(10,8,0,0.8);
+    position: relative;
+    box-shadow: 0 0 60px rgba(201,168,76,0.15), inset 0 0 30px rgba(0,0,0,0.5);
+  }
+
+  .poster-wrap img {
+    width: 100%;
+    display: block;
+    max-height: 72vh;
+    object-fit: contain;
+  }
+
+  .poster-caption {
+    text-align: center;
+    margin-top: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--gold);
+  }
+
+  /* ══════════════════════════════
+     NAV BUTTONS
+  ══════════════════════════════ */
+  .btn-nav {
+    position: fixed;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: none;
+    z-index: 100;
+    padding: 10px 16px;
+    transition: color 0.3s;
+  }
+
+  #btn-back {
+    top: 28px;
+    left: 32px;
+    color: var(--gold);
+    border-left: 1px solid var(--gold);
+  }
+  #btn-back:hover { color: var(--gold-light); }
+  #btn-back::before { content: '← '; }
+
+  #btn-next {
+    bottom: 28px;
+    right: 32px;
+    color: var(--gold);
+    border-right: 1px solid var(--gold);
+  }
+  #btn-next:hover { color: var(--gold-light); }
+  #btn-next::after { content: ' →'; }
+
+  .btn-nav.visible { display: block; }
+
+  /* ══════════════════════════════
+     AUDIO
+  ══════════════════════════════ */
+  #audio-status {
+    position: fixed;
+    bottom: 28px;
+    left: 32px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(201,168,76,0.4);
+    text-transform: uppercase;
+    z-index: 100;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  #audio-status:hover { color: var(--gold); }
+
+  /* ══════════════════════════════
+     GOLD SHIMMER DIVIDER
+  ══════════════════════════════ */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 16px auto;
+    width: 180px;
+  }
+
+  /* scroll overflow for info on small screens */
+  @media (max-height: 700px) {
+    #screen-info { overflow-y: auto; justify-content: flex-start; padding-top: 80px; }
+    .info-box { margin-bottom: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- ════ SCREEN 1 — MAIN MENU ════ -->
+<div class="screen active" id="screen-menu">
+  <div class="menu-frame">
+    <div class="corner-br"></div>
+    <div class="corner-tl-inner"></div>
+
+    <div class="menu-subtitle">You Are Cordially Invited To</div>
+    <div class="ornament"><span>✦</span></div>
+    <div class="menu-title">BINTANG</div>
+    <div class="ornament"><span>✦</span></div>
+    <div class="menu-desc">
+      Farewell Party<br>
+      <span style="font-size:13px;letter-spacing:3px;">An Evening of Elegance</span>
+    </div>
+    <div class="divider"></div>
+    <button class="btn-start" onclick="goToChoose()">Enter</button>
+  </div>
+</div>
+
+<!-- ════ SCREEN 2 — CHOOSE ════ -->
+<div class="screen" id="screen-choose">
+  <div class="choose-title">Dress Code Selection</div>
+  <div class="ornament"><span>◆</span></div>
+  <div class="choose-heading">What Are You Wearing?</div>
+
+  <div class="cards-row">
+    <div class="card-choice" onclick="goToInfo('dress')">
+      <div class="c1"></div><div class="c2"></div><div class="c3"></div><div class="c4"></div>
+      <span class="card-icon">👗</span>
+      <div class="card-label">Dress</div>
+      <div class="card-sub">For Her</div>
+    </div>
+
+    <div class="card-choice" onclick="goToInfo('suits')">
+      <div class="c1"></div><div class="c2"></div><div class="c3"></div><div class="c4"></div>
+      <span class="card-icon">🤵</span>
+      <div class="card-label">Suits</div>
+      <div class="card-sub">For Him</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SCREEN 3 — INFO ════ -->
+<div class="screen" id="screen-info">
+  <div class="info-box" id="info-content">
+    <!-- injected by JS -->
+  </div>
+</div>
+
+<!-- ════ SCREEN 4 — POSTER ════ -->
+<div class="screen" id="screen-poster">
+  <div class="poster-wrap">
+    <img id="poster-img" src="" alt="Invitation Poster">
+    <div class="poster-caption" id="poster-caption"></div>
+  </div>
+</div>
+
+<!-- ════ NAV BUTTONS ════ -->
+<button class="btn-nav" id="btn-back" onclick="goBack()">Back</button>
+<button class="btn-nav" id="btn-next" onclick="goNext()">Next</button>
+
+<!-- ════ AUDIO STATUS ════ -->
+<div id="audio-status" onclick="toggleAudio()">♪ Mono</div>
+
+<!-- ════ AUDIO ════ -->
+<audio id="bgm" loop>
+  <source src="mono.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  /* ── STATE ── */
+  let currentScreen = 'menu';
+  let currentChoice = null; // 'dress' | 'suits'
+  const audio = document.getElementById('bgm');
+  let audioPlaying = false;
+
+  const DRESS_INFO = {
+    tag: 'For Her',
+    heading: 'DRESS CODE',
+    rows: [
+      { icon: '👗', label: 'Dress Code', value: '<em>Met Gala — Red Carpet</em>' },
+      { icon: '✨', label: 'Tema', value: 'Tampil memukau layaknya red carpet Met Gala. Pilih gaun elegan, glamour, atau avant-garde yang berani. Warna-warna bold, mewah, dan prestisius sangat dianjurkan.' },
+      { icon: '💄', label: 'Gaya', value: 'Full glam. No half measures. Be iconic, be bold, be unforgettable.' },
+      { icon: '📍', label: 'Venue', value: '<em>MOEARA Eatery and Hub</em>' },
+    ]
+  };
+
+  const SUITS_INFO = {
+    tag: 'For Him',
+    heading: 'DRESS CODE',
+    rows: [
+      { icon: '🤵', label: 'Dress Code', value: '<em>Jas Formal</em>' },
+      { icon: '👔', label: 'Gaya', value: 'Kenakan jas formal lengkap — setelan jas, kemeja, dasi atau dasi kupu-kupu. Tampil rapi, tajam, dan elegan di malam yang berkesan ini.' },
+      { icon: '🎩', label: 'Catatan', value: 'Pilih warna klasik seperti hitam, navy, abu-abu, atau tuxedo putih. Aksesoris seperti pocket square atau cufflinks sangat dianjurkan.' },
+      { icon: '📍', label: 'Venue', value: '<em>MOEARA Eatery and Hub</em>' },
+    ]
+  };
+
+  /* ── SCREENS ── */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+  }
+
+  function updateNav() {
+    const back = document.getElementById('btn-back');
+    const next = document.getElementById('btn-next');
+    back.classList.remove('visible');
+    next.classList.remove('visible');
+
+    if (currentScreen === 'info')  { back.classList.add('visible'); next.classList.add('visible'); }
+    if (currentScreen === 'poster') { back.classList.add('visible'); }
+  }
+
+  /* ── TRANSITIONS ── */
+  function goToChoose() {
+    startAudio();
+    currentScreen = 'choose';
+    showScreen('choose');
+    updateNav();
+  }
+
+  function goToInfo(choice) {
+    currentChoice = choice;
+    currentScreen = 'info';
+
+    const data = choice === 'dress' ? DRESS_INFO : SUITS_INFO;
+    const box = document.getElementById('info-content');
+    box.innerHTML = `
+      <span class="info-tag">${data.tag}</span>
+      <div class="info-heading">${data.heading}</div>
+      <div class="ornament"><span style="color:var(--gold)">✦</span></div>
+      <div class="info-body">
+        ${data.rows.map(r => `
+          <div class="info-row">
+            <span class="info-row-icon">${r.icon}</span>
+            <div class="info-row-content">
+              <div class="info-row-label">${r.label}</div>
+              <div class="info-row-value">${r.value}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    showScreen('info');
+    updateNav();
+  }
+
+  function goNext() {
+    if (currentScreen === 'info') {
+      currentScreen = 'poster';
+      const img = document.getElementById('poster-img');
+      const cap = document.getElementById('poster-caption');
+
+      if (currentChoice === 'dress') {
+        img.src = 'dress.png';
+        cap.textContent = 'Dress Code — Met Gala Red Carpet';
+      } else if (currentChoice === 'suits') {
+        img.src = 'suits.png';
+        cap.textContent = 'Dress Code — Jas Formal';
+      }
+
+      showScreen('poster');
+      updateNav();
+    }
+  }
+
+  function goBack() {
+    if (currentScreen === 'info') {
+      currentScreen = 'choose';
+      showScreen('choose');
+      updateNav();
+    } else if (currentScreen === 'poster') {
+      currentScreen = 'info';
+      showScreen('info');
+      updateNav();
+    }
+  }
+
+  /* ── AUDIO ── */
+  function startAudio() {
+    audio.volume = 0.45;
+    audio.play().then(() => {
+      audioPlaying = true;
+      document.getElementById('audio-status').textContent = '♪ Mono — Playing';
+    }).catch(() => {
+      document.getElementById('audio-status').textContent = '♪ Click to Play';
+    });
+  }
+
+  function toggleAudio() {
+    if (audioPlaying) {
+      audio.pause();
+      audioPlaying = false;
+      document.getElementById('audio-status').textContent = '♪ Paused';
+    } else {
+      audio.play();
+      audioPlaying = true;
+      document.getElementById('audio-status').textContent = '♪ Mono — Playing';
+    }
+  }
+
+  /* ── PARTICLES ── */
+  (function() {
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function rand(a, b) { return a + Math.random() * (b - a); }
+
+    for (let i = 0; i < 70; i++) {
+      particles.push({
+        x: rand(0, 1), y: rand(0, 1),
+        r: rand(0.4, 1.6),
+        alpha: rand(0.1, 0.5),
+        speed: rand(0.00008, 0.0002),
+        phase: rand(0, Math.PI * 2)
+      });
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, W, H);
+      for (const p of particles) {
+        const y = (p.y + p.speed * t * 0.001) % 1;
+        const drift = Math.sin(p.phase + t * 0.0005) * 0.015;
+        const x = (p.x + drift + 1) % 1;
+        const pulse = 0.3 + 0.7 * Math.abs(Math.sin(p.phase + t * 0.001));
+        ctx.beginPath();
+        ctx.arc(x * W, y * H, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201,168,76,${p.alpha * pulse})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+</script>
+</body>
+</html>
